@@ -1,9 +1,10 @@
 module.exports = function() {
     var client = './src/client/';
     var clientApp = client + 'app/';
+    var temp = './.tmp/';
 
     var config = {
-        temp: './.tmp/',
+        temp: temp,
 
         // all js to vet
         alljs: [
@@ -11,6 +12,7 @@ module.exports = function() {
             './*.js'
         ],
         client: client,
+        css: temp + 'styles.css',
         index: client + 'index.html',
         js: [
             clientApp + '**/*.module.js',
