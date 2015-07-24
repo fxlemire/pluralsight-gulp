@@ -13,6 +13,9 @@ var port = process.env.PORT || config.defaultPort;
 //var gulpprint = require('gulp-print');
 //var gulpif = require('gulp-if');
 
+gulp.task('help', $.taskListing);
+gulp.task('default', ['help']);
+
 gulp.task('vet', function() {
     log('Analyzing source with JSHint and JSCS');
 
@@ -37,10 +40,39 @@ gulp.task('styles', ['clean-styles'], function() {
         .pipe(gulp.dest(config.temp));
 });
 
+gulp.task('fonts', ['clean-fonts'], function() {
+    log('Copying fonts');
+
+    return gulp.src(config.fonts)
+        .pipe(gulp.dest(config.build + 'fonts'));
+});
+
+gulp.task('images', ['clean-images'], function() {
+    log('Copying and compressing the images');
+
+    return gulp
+        .src(config.images)
+        .pipe($.imagemin({optimizationLevel: 4}))
+        .pipe(gulp.dest(config.build + 'images'));
+});
+
+gulp.task('clean', function(done) {
+    var delconfig = [].concat(config.build, config.temp);
+    log('Cleaning: ' + $.util.colors.yellow(delconfig));
+    del(delconfig, done);
+});
+
 // we want clean-styles to have a callback (done) since it does not use a stream
+gulp.task('clean-fonts', function(done) {
+    clean(config.build + 'fonts/**/*.*', done);
+});
+
+gulp.task('clean-images', function(done) {
+    clean(config.build + 'images/**/*.*', done);
+});
+
 gulp.task('clean-styles', function(done) {
-    var files = config.temp + '**/*.css';
-    clean(files, done);
+    clean(config.temp + '**/*.css', done);
 });
 
 gulp.task('less-watcher', function() {
@@ -113,7 +145,7 @@ function changeEvent(event) {
 }
 
 function clean(path, done) {
-    log('Cleaning: ' + $.util.colors.blue(path));
+    log('Cleaning: ' + $.util.colors.yellow(path));
     del(path, done);
 }
 
@@ -130,11 +162,11 @@ function log(msg) {
     if (typeof(msg) === 'object') {
         for (var item in msg) {
             if (msg.hasOwnProperty(item)) {
-                $.util.log($.util.colors.blue(msg[item]));
+                $.util.log($.util.colors.yellow(msg[item]));
             }
         }
     } else {
-        $.util.log($.util.colors.blue(msg));
+        $.util.log($.util.colors.yellow(msg));
     }
 }
 
